@@ -1,0 +1,140 @@
+﻿@using Epam.Mercato.WebPL.Models;
+@using Epam.Mercato.BLL.Interfaces;
+@using Epam.Mercato.Entities;
+@using Epam.Mercato.IOC;
+@using System.Text.RegularExpressions;
+@{
+    Layout = "~/Pages/administrator/_AdministratorLayout.cshtml";
+    Page.Title = "Manage products";
+    AdministratorRoleProvider roleProvider = new AdministratorRoleProvider();
+    if (!(roleProvider.IsUserInRole(User.Identity.Name, "administrator") | roleProvider.IsUserInRole(User.Identity.Name, "moderator")))
+    {
+        Response.Redirect("~/Pages/administrator/SignIn");
+    }
+    IProductLogic productLogic = DependencyResolver.ProductLogic;
+    IProducerLogic producerLogic = DependencyResolver.ProducerLogic;
+    WebImage photo = null;
+    Product product = new Product();
+    int id = 0;
+    byte[] newPhoto = new byte[] { };
+    if (!IsPost)
+    {
+        int.TryParse(Request["id"], out id);
+        if (id != 0)
+        {
+            product = productLogic.GetById(id);
+        }
+    }
+    if (IsPost)
+    {
+        int.TryParse(Request["inputId"], out id);
+        string newValue = Request["name"];
+        int category = 0;
+        int.TryParse(Request["category"], out category);
+        int country = 0;
+        int.TryParse(Request["country"], out country);
+        int producer = 0;
+        int.TryParse(Request["producer"], out producer);
+        decimal price = 0;
+        decimal.TryParse(Request["price"], out price);
+        string characteristics = Request["characteristics"];
+        string pattern = @"\;";
+        string[] characteristic = Regex.Split(characteristics, pattern);
+
+        photo = WebImage.GetImageFromRequest();
+        if (photo != null)
+        {
+            photo.Resize(width: 140, height: 140, preserveAspectRatio: true, preventEnlarge: true);
+            newPhoto = photo.GetBytes();
+        }
+        else
+        {
+            newPhoto = productLogic.GetById(id).Photo;
+        }
+        if (id != 0 && newValue != null && newValue != "")
+        {
+            if (productLogic.EditProduct(id, new Product() { Name = newValue, Category = category, Country = country, Producer = producer, Photo = newPhoto, Price = price, Characteristics = characteristics }))
+            {
+                Response.Redirect("~/pages/administrator/");
+            }
+        }
+    }
+}
+<div>
+    <form action="~/pages/administrator/EditProduct" method="post" class="form-edit" enctype="multipart/form-data">
+        <input type="text" class="form-control" name="inputId" value="@id" hidden>
+        <div class="form-group row">
+            <label for="name" class="col-sm-2 col-form-label">Name</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" name="name" value="@product.Name">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="country" class="col-sm-2 col-form-label">Country</label>
+            <div class="col-sm-10">
+                <select name="country">
+                    @foreach (var item in productLogic.GetCountries())
+                    {
+                        <option value="@item.Key" @if (product.Country == item.Key) { <text> selected</text>}>@item.Value</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="category" class="col-sm-2 col-form-label">Category</label>
+            <div class="col-sm-10">
+                <select name="category">
+                    @foreach (var item in productLogic.GetCategories())
+                    {
+                        <option value="@item.Key" @if (product.Category == item.Key) { <text> selected</text>}>@item.Value</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="producer" class="col-sm-2 col-form-label">Producer</label>
+            <div class="col-sm-10">
+                <select name="producer">
+                    @foreach (var item in producerLogic.GetAll())
+                    {
+                        <option value="@item.Key" @if (product.Producer == item.Key) { <text> selected</text>}>@item.Value.Name</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="price" class="col-sm-2 col-form-label">Price</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" name="price" value="@product.Price">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="characteristics" class="col-sm-2 col-form-label">Characteristics</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" name="characteristics" value="@product.Characteristics">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="inputFile" class="col-sm-2 col-form-label">Image</label>
+            <div class="col-sm-10">
+                <input type="file" name="inputFile">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="ImageFile" class="col-sm-2 col-form-label">Image now</label>
+            <div class="col-sm-10">
+                @{
+                    if (id != 0 && product.Photo != null)
+                    {
+                        <img src="@String.Format("data:image/jpg;base64,{0}", Convert.ToBase64String(product.Photo))">
+                    }
+                    else
+                    {
+                        <img src="~/Content/images/default_award.jpg" width="25px" height="25px">
+                    }
+                }
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary mb-2">Edit product</button>
+    </form>
+</div>

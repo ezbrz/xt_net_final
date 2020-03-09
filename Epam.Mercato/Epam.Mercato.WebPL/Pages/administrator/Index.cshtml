@@ -1,0 +1,213 @@
+﻿@using Epam.Mercato.WebPL.Models;
+@using Epam.Mercato.BLL.Interfaces;
+@using Epam.Mercato.Entities;
+@using Epam.Mercato.IOC;
+@using System.Text.RegularExpressions;
+@{
+    Layout = "~/Pages/administrator/_AdministratorLayout.cshtml";
+    Page.Title = "Manage products";
+    AdministratorRoleProvider roleProvider = new AdministratorRoleProvider();
+    if (!(roleProvider.IsUserInRole(User.Identity.Name, "administrator") | roleProvider.IsUserInRole(User.Identity.Name, "moderator")))
+    {
+        Response.Redirect("~/Pages/administrator/SignIn");
+    }
+    IProductLogic productLogic = DependencyResolver.ProductLogic;
+    IProducerLogic producerLogic = DependencyResolver.ProducerLogic;
+    WebImage photo = null;
+    Dictionary<int, Product> products = new Dictionary<int, Product>();
+    byte[] newPhoto = new byte[] { };
+    string[] characteristic = null;
+    string pattern = @"\,";
+    if (!IsPost)
+    {
+        int categoryId = 0;
+        int.TryParse(Request["categoryId"], out categoryId);
+        if (categoryId == 0)
+        {
+            products = productLogic.GetAll();
+        }
+        else
+        {
+            products = productLogic.GetAll(categoryId);
+        }
+    }
+    if (IsPost)
+    {
+        string newValue = Request["name"];
+        int category = 0;
+        int.TryParse(Request["category"], out category);
+        int country = 0;
+        int.TryParse(Request["country"], out country);
+        int producer = 0;
+        int.TryParse(Request["producer"], out producer);
+        decimal price = 0;
+        decimal.TryParse(Request["price"], out price);
+        string characteristics = Request["characteristics"];
+        characteristic = Regex.Split(characteristics, pattern);
+
+        photo = WebImage.GetImageFromRequest();
+        if (photo != null)
+        {
+            photo.Resize(width: 140, height: 140, preserveAspectRatio: true, preventEnlarge: true);
+            newPhoto = photo.GetBytes();
+        }
+        if (newValue != null && newValue != "")
+        {
+            if (productLogic.AddNewProduct(new Product() { Name = newValue, Category = category, Country = country, Producer = producer, Photo = newPhoto, Price = price, Characteristics = characteristics }))
+            {
+                Response.Redirect("~/pages/administrator");
+            }
+        }
+    }
+}
+
+<div class="categories">
+    <a href="~/pages/administrator/">Все товары</a>
+    @foreach (var item in productLogic.GetCategories())
+    {
+        <a href="~/pages/administrator/index?categoryId=@item.Key">@item.Value</a>
+    }
+</div>
+<form action="~/pages/administrator/index" method="post" class="form-edit" enctype="multipart/form-data">
+    <div class="form-group row">
+        <label for="name" class="col-sm-2 col-form-label">Name</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" name="name">
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="country" class="col-sm-2 col-form-label">Country</label>
+        <div class="col-sm-10">
+            <select name="country">
+                @foreach (var item in productLogic.GetCountries())
+                {
+                    <option value="@item.Key">@item.Value</option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="category" class="col-sm-2 col-form-label">Category</label>
+        <div class="col-sm-10">
+            <select name="category">
+                @foreach (var item in productLogic.GetCategories())
+                {
+                    <option value="@item.Key">@item.Value</option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="producer" class="col-sm-2 col-form-label">Producer</label>
+        <div class="col-sm-10">
+            <select name="producer">
+                @foreach (var item in producerLogic.GetAll())
+                {
+                    <option value="@item.Key">@item.Value.Name</option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="price" class="col-sm-2 col-form-label">Price</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" name="price">
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="characteristics" class="col-sm-2 col-form-label">Characteristics</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" name="characteristics">
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="inputFile" class="col-sm-2 col-form-label">Image</label>
+        <div class="col-sm-10">
+            <input type="file" name="inputFile">
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary mb-2">Add product</button>
+</form>
+<div>
+    <table class="table table-hover">
+        <thead class="thead-light">
+            <tr>
+                <th>
+                    Id
+                </th>
+                <th>
+                    Name
+                </th>
+                <th>
+                    Category
+                </th>
+                <th>
+                    Producer
+                </th>
+                <th>
+                    Characteristic
+                </th>
+                <th>
+                    Country
+                </th>
+                <th>
+                    Photo
+                </th>
+                <th>
+                    Price
+                </th>
+                <th class="col col-md-2">
+                    Control
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in products)
+            {
+                <tr>
+                    <td>@item.Key</td>
+                    <td>@item.Value.Name</td>
+                    <td>@productLogic.GetCategories().FirstOrDefault(x => x.Key == item.Value.Category).Value</td>
+                    <td>@producerLogic.GetAll().FirstOrDefault(x => x.Key == item.Value.Producer).Value.Name</td>
+                    <td>
+
+                        @if (item.Value.Characteristics != null)
+                        {
+                            <div class="characteristic_popup">Characteristics</div>
+                            <div class="hidden_characteristics">
+                                @foreach (var elem in Regex.Split(item.Value.Characteristics, pattern))
+                                {
+                                    @elem<text>, </text>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <text>No characteristics</text>
+                        }
+                    </td>
+                    <td>@productLogic.GetCountries().FirstOrDefault(x => x.Key == item.Value.Country).Value</td>
+                    <td>
+                        @{
+                            if (item.Value.Photo != null)
+                            {
+                                <img src="@String.Format("data:image/jpg;base64,{0}", Convert.ToBase64String(item.Value.Photo))" width="25px" height="25px">
+                            }
+                            else
+                            {
+                                <img src="~/Content/images/default_logo.jpg" width="25px" height="25px">
+                            }
+                        }
+                    </td>
+                    <td>@string.Format("{0:C}", item.Value.Price)</td>
+                    <td name="@item.Key">
+                        <div class="action" name="user-action">
+                            <a href="~/pages/administrator/EditProduct?id=@item.Key"><div class="btn btn-info" name="edit">Edit product</div></a>
+                            <a href="~/pages/administrator/DeleteProduct?id=@item.Key"><div class="btn btn-danger" name="delete">Delete</div></a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

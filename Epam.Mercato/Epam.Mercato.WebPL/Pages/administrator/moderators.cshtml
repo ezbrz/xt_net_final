@@ -1,0 +1,111 @@
+﻿@using Epam.Mercato.BLL.Interfaces;
+@using Epam.Mercato.Entities;
+@using Epam.Mercato.WebPL.Models;
+@using Epam.Mercato.IOC;
+@{
+    Layout = "~/Pages/administrator/_AdministratorLayout.cshtml";
+    Page.Title = "Manage moderators";
+    AdministratorRoleProvider roleProvider = new AdministratorRoleProvider();
+    if (!roleProvider.IsUserInRole(User.Identity.Name, "administrator"))
+    {
+        Response.Redirect("~/Pages/administrator");
+    }
+    IModeratorLogic moderatorLogic = DependencyResolver.ModeratorLogic;
+    string errorMessage = null;
+    if (IsPost)
+    {
+        string login = Request["login"];
+        string password = Request["password"];
+        string role = Request["role"];
+        Role newRole;
+        if (!moderatorLogic.IsUniqueLogin(login))
+        {
+            errorMessage = "Moderator with this username already exists!";
+        }
+        if (!moderatorLogic.IsValidLogin(login))
+        {
+            errorMessage = "Invalid Login. Login must contain letters a-z A-Z or degrees 0-9. Password must contain 6 and more symbols. Login must start with letter!";
+        }
+        if (!moderatorLogic.IsValidPassword(password))
+        {
+            errorMessage = "Invalid Password. Password must contain letters a-z A-Z, degrees 0-9 or symbols [!, $, .]. Password must contain 8 and more symbols!";
+        }
+        if (!Enum.TryParse(role, true, out newRole))
+        {
+            errorMessage = "You must choose role!";
+        }
+        if (errorMessage == null)
+        {
+            moderatorLogic.AddNewModerator(login, password, newRole);
+        }
+    }
+}
+    
+<div>
+    <form action="~/Pages/administrator/moderators.cshtml" method="post">
+        <div class="form-group row">
+            <label for="login" class="col-sm-2 col-form-label">Login</label>
+            <div class="col-sm-6">
+                <input type="text" name="login" id="login" class="form-control" />
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="password" class="col-sm-2 col-form-label">Password</label>
+            <div class="col-sm-6">
+                <input type="password" name="password" id="password" class="form-control" />
+            </div>
+        </div>
+        <div class="form-group row col-sm-12">
+            <div class="form-check form-check-inline">
+                <input type="radio" id="moderator" class="form-check-input" name="role" value="Moderator" />
+                <label for="moderator" class="col-sm-2 col-form-label">Moderator</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input type="radio" id="administrator" name="role" value="Administrator" />
+                <label for="administrator" class="col-sm-2 col-form-label">Administrator</label>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary mb-2">Add new</button>
+        @if (errorMessage != null)
+        {
+            <div class="alert-danger">@errorMessage</div>
+        }
+    </form>
+</div>
+<div>
+    <table class="table table-hover">
+        <thead class="thead-light">
+            <tr>
+                <th>
+                    Id
+                </th>
+                <th>
+                    Login
+                </th>
+                <th>
+                    Role
+                </th>
+                <th>
+                    Control
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in moderatorLogic.GetAll())
+            {
+                <tr>
+                    <td>@item.Key</td>
+                    <td>@item.Value.Login</td>
+                    <td>@item.Value.ModeratorRole</td>
+                    <td name="@item.Key">
+                        <div class="action" name="user-action">
+                            <a href="~/Pages/administrator/EditModerator.cshtml?id=@item.Key"><div class="btn btn-info" name="edit">Edit moderator</div></a>
+                            <a href="~/Pages/administrator/DeleteModerator?id=@item.Key"><div class="btn btn-danger" name="delete">Delete moderator</div></a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

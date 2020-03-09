@@ -1,0 +1,45 @@
+﻿@using Epam.Mercato.BLL.Interfaces;
+@using Epam.Mercato.IOC;
+@using System.Security.Cryptography;
+@using System.Text;
+@{
+    Layout = "~/Pages/administrator/_AdministratorLayout.cshtml";
+    Page.Title = "Sign in";
+
+    string name = null;
+    name = Request["login"];
+    string password = null;
+    password = Request["password"];
+    if (IsPost)
+    {
+        IModeratorLogic moderatorLogic = DependencyResolver.ModeratorLogic;
+        int userId = moderatorLogic.GetAll().FirstOrDefault(x => x.Value.Login == name).Key;
+        if (userId != 0)
+        {
+            SHA512 shaM = new SHA512Managed();
+            string result = string.Join("", shaM.ComputeHash(Encoding.UTF8.GetBytes(password)));
+            if (moderatorLogic.GetPassword(userId) == result)
+            {
+                FormsAuthentication.SetAuthCookie(name, createPersistentCookie: true);
+            }
+        }
+        Response.Redirect("~/Pages/administrator");
+    }
+}
+    <form action="~/Pages/administrator/SignIn" method="post" class="form-edit">
+        <div class="form-group row">
+            <label for="login" class="col-sm-2 col-form-label">Login</label>
+            <div class="col-sm-6">
+            <input type="text" class="form-control" name="login">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="password" class="col-sm-2 col-form-label">Password</label>
+            <div class="col-sm-6">
+            <input type="password" class="form-control" name="password">
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary mb-2">Sign in</button>
+    </form>
+<a href="/"><div class="btn btn-info">Back to shop</div></a>

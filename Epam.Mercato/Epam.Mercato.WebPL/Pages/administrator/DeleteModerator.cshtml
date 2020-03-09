@@ -1,0 +1,23 @@
+﻿@using Epam.Mercato.BLL.Interfaces;
+@using Epam.Mercato.IOC;
+@using Epam.Mercato.WebPL.Models;
+@{
+        AdministratorRoleProvider roleProvider = new AdministratorRoleProvider();
+        if (!roleProvider.IsUserInRole(User.Identity.Name, "administrator"))
+        {
+            Response.Redirect("~/Pages/administrator");
+        }
+
+        if (!IsPost)
+        {
+            IModeratorLogic moderatorLogic = DependencyResolver.ModeratorLogic;
+            int id = 0;
+            if (int.TryParse(Request["id"], out id) && id != 0)
+            {
+                if (moderatorLogic.DeleteById(id))
+                {
+                    Response.Redirect("~/Pages/administrator/moderators");
+                }
+            }
+        }
+    }

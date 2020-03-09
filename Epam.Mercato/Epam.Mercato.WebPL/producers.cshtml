@@ -1,0 +1,52 @@
+﻿@using Epam.Mercato.WebPL.Models;
+@using Epam.Mercato.BLL.Interfaces;
+@using Epam.Mercato.Entities;
+@using Epam.Mercato.IOC;
+@using System.Text.RegularExpressions;
+@{
+    Layout = "~/Pages/main/_MainLayout.cshtml";
+    Page.Title = "Mercato. Наши бренды";
+    IProductLogic productLogic = DependencyResolver.ProductLogic;
+    IProducerLogic producerLogic = DependencyResolver.ProducerLogic;
+}
+<div class="row">
+    <div class="col col-2">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link active" href="~/index">Все категории</a>
+            </li>
+            @foreach (var item in productLogic.GetCategories())
+            {
+                <li class="nav-item">
+                    <a class="nav-link active" href="~/index?categoryId=@item.Key">@item.Value</a>
+                </li>
+            }
+        </ul>
+    </div>
+    <div class="col col-10">
+        <div class="row align-items-center">
+            @foreach (var item in producerLogic.GetAll())
+            {
+                
+            <div class="col col-3">
+                <a href="~/index?id=@item.Key&param=brand">
+                    <div class="product">
+                        <div class="product-photo">
+                            @if (item.Value.Logo != null)
+                            {
+                                <img src="@String.Format("data:image/jpg;base64,{0}", Convert.ToBase64String(item.Value.Logo))" width="140px" height="140px">
+                            }
+                            else
+                            {
+                                <img src="~/Content/images/default_logo.jpg" width="140px" height="140px">
+                            }
+                        </div>
+                        <div class="product-producer-name">@item.Value.Name</div>
+                    </div>
+                </a>
+            </div>
+
+            }
+        </div>
+    </div>
+</div>

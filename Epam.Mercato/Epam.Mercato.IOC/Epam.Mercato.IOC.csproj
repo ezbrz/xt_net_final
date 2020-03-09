@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{3324EB13-E468-476F-9EA2-E9890F16F788}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Epam.Mercato.IOC</RootNamespace>
+    <AssemblyName>Epam.Mercato.IOC</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DependencyResolver.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Epam.Mercato.BLL.Interfaces\Epam.Mercato.BLL.Interfaces.csproj">
+      <Project>{911d47cb-5d19-43ad-b84a-e55ebcc98ff1}</Project>
+      <Name>Epam.Mercato.BLL.Interfaces</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Epam.Mercato.BLL\Epam.Mercato.BLL.csproj">
+      <Project>{4a62617b-7e38-4cd4-b7bf-5a18afe2eae4}</Project>
+      <Name>Epam.Mercato.BLL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Epam.Mercato.DAL\Epam.Mercato.DAL.csproj">
+      <Project>{d96241c7-9eab-4b83-a45b-5015799fa794}</Project>
+      <Name>Epam.Mercato.DAL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Epam.Mercato.DAO.Interfaces\Epam.Mercato.DAO.Interfaces.csproj">
+      <Project>{4dd171db-b797-495c-a0c2-73525b53e6fd}</Project>
+      <Name>Epam.Mercato.DAO.Interfaces</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Epam.Mercato.Entities\Epam.Mercato.Entities.csproj">
+      <Project>{45680e6c-7721-4dac-badc-d581839606f9}</Project>
+      <Name>Epam.Mercato.Entities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Epam.Mercato.Handlers\Epam.Mercato.Handlers.csproj">
+      <Project>{5a95695e-d071-4d19-9ecb-ca538e7172af}</Project>
+      <Name>Epam.Mercato.Handlers</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

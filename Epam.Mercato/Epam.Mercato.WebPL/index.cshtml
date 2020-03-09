@@ -1,0 +1,115 @@
+﻿@using Epam.Mercato.BLL.Interfaces;
+@using Epam.Mercato.Entities;
+@using Epam.Mercato.IOC;
+@using Epam.Mercato.Handlers;
+@{
+    Layout = "~/Pages/main/_MainLayout.cshtml";
+    Page.Title = "Mercato. Товары для отделки";
+    IProductLogic productLogic = DependencyResolver.ProductLogic;
+    IProducerLogic producerLogic = DependencyResolver.ProducerLogic;
+    Filter filter = new Filter();
+    Dictionary<int, Product> products = new Dictionary<int, Product>();
+    byte[] newPhoto = new byte[] { };
+
+    int categoryId = 0;
+    if (!IsPost)
+    {
+        int id = 0;
+        int.TryParse(Request["categoryId"], out categoryId);
+        int.TryParse(Request["id"], out id);
+        if (categoryId == 0)
+        {
+            products = productLogic.GetAll();
+            if (products.Count > 10)
+            {
+                products = products.OrderByDescending(x=>x.Value.Price).Take(10).ToDictionary(x=>x.Key,x=>x.Value);
+            }
+        }
+        else
+        {
+            products = productLogic.GetAll(categoryId);
+        }
+        if (Request["param"] == "brand"&&id!=0)
+        {
+            products = productLogic.GetAll().Where(x=>x.Value.Producer==id).ToDictionary(x=>x.Key,x=>x.Value);
+        }
+    }
+    if (IsPost)
+    {
+        filter.IsDescending = Request["order"]=="desc" ? true : false;
+        filter.SearchPattern = Request["search"];
+        filter.OrderProperty = Request["param"];
+        int.TryParse(Request["categoryId"], out categoryId);
+        filter.Category = categoryId;
+        products = productLogic.GetAll(filter);
+    }
+}
+    <div class="container">
+        <form class="form-search row" action="~/" method="post">
+            <input type="text" name="categoryId" value="@categoryId" hidden />
+            <div class="form-group row col-12"><input type="text" class="search-pattern form-control col-12" placeholder="Enter your search query..." name="search" /></div>
+            <div class="form-group row col-12">
+                <label for="orderby" class="col-sm-2 col-form-label">Order by</label>
+                <div class="form-check form-check-inline">
+                    <input type="radio" id="ascen" class="form-check-input" name="order" value="ascen" checked />
+                    <label for="ascen" class="col-sm-2 col-form-label">Ascending</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input type="radio" id="desc" class="form-check-input" name="order" value="desc" />
+                    <label for="desc" class="col-sm-2 col-form-label">Descending</label>
+                </div>
+
+                <div class="col-sm-6">
+                    <select name="param" class="form-control-sm">
+                        <option disabled selected>Сортировка</option>
+                        <option value="price">Price</option>
+                        <option value="category">Category</option>
+                        <option value="producer">Producer</option>
+                    </select>
+                </div>
+                <div class="col-2"><button type="submit" class="btn btn-dark col-12">Filter</button></div>
+            </div>
+
+        </form>
+    </div>
+<div class="row">
+    <div class="col col-2">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link active" href="~/index">Все категории</a>
+            </li>
+            @foreach (var item in productLogic.GetCategories())
+            {
+                <li class="nav-item">
+                    <a class="nav-link active" href="~/index?categoryId=@item.Key">@item.Value</a>
+                </li>
+            }
+        </ul>
+    </div>
+    <div class="col col-10">
+        <div class="row align-items-center">
+            @foreach (var item in products)
+            {
+                <div class="col col-3">
+                    <div class="product">
+                        <div class="product-photo">
+                            @if (item.Value.Photo != null)
+                            {
+                                <img src="@String.Format("data:image/jpg;base64,{0}", Convert.ToBase64String(item.Value.Photo))" width="140px" height="140px">
+                            }
+                            else
+                            {
+                                <img src="~/Content/images/default_logo.jpg" width="140px" height="140px">
+                            }
+                        </div>
+                        <div class="product-name">@item.Value.Name</div>
+                        <div class="product-price">@string.Format("{0:C}", item.Value.Price)</div>
+                    </div>
+
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+    

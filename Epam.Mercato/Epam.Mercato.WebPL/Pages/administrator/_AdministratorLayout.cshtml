@@ -1,0 +1,43 @@
+﻿@using Epam.Mercato.WebPL.Models;
+@{
+    Layout = null;
+    AdministratorRoleProvider roleProvider = new AdministratorRoleProvider();
+    
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link href="~/Content/bootstrap.css" rel="stylesheet" />
+    <link href="~/Content/styles.css" rel="stylesheet" />
+    <title>@Page.Title</title>
+</head>
+<body>
+    <div class="layout"></div>
+    <div class="header">
+        <div class="container">
+            <div class="header-text"><a href="~/Pages/administrator/">Administrator panel</a></div>
+            <div class="header-nav">
+
+                <a href="~/Pages/administrator/">Products</a>
+                @if (roleProvider.IsUserInRole(User.Identity.Name, "administrator"))
+                {<a href="~/Pages/administrator/moderators">Moderators</a>}
+                <a href="~/Pages/administrator/producers">Producers</a>
+            </div>
+            <div class="header-login">
+                @if (User.Identity.IsAuthenticated)
+                {<text>[</text><a href="~/Pages/administrator/EditUser">@User.Identity.Name</a><text>]&nbsp;<a href="~/Pages/administrator/SignOut">SignOut</a></text>}
+            </div>
+        </div>
+    </div>
+
+    <div class="container container-main main">
+        @RenderBody()
+    </div>
+    <script src="~/Scripts/jquery-3.0.0.js"></script>
+    <script src="~/Scripts/bootstrap.js"></script>
+    <script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+</body>
+</html>
