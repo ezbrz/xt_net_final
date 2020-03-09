@@ -100,6 +100,9 @@
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\styles.css" />
+    <Content Include="Scripts\app\actions.js" />
+    <Content Include="Scripts\app\js.js" />
+    <Content Include="Scripts\app\validation.js" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\bootstrap.js" />
@@ -133,6 +136,7 @@
     <Content Include="producers.cshtml" />
     <Content Include="Pages\ErrorPage.cshtml" />
     <Content Include="About.cshtml" />
+    <Content Include="Pages\administrator\_Scripts.cshtml" />
     <None Include="Scripts\jquery-3.0.0-vsdoc.js" />
     <Content Include="Scripts\jquery-3.0.0.js" />
     <Content Include="Scripts\jquery-3.0.0.min.js" />
@@ -265,9 +269,7 @@
       <Name>Epam.Mercato.IOC</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Scripts\app\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\index.d.ts" />
   </ItemGroup>

@@ -166,7 +166,7 @@
             {
                 <tr>
                     <td>@item.Key</td>
-                    <td>@item.Value.Name</td>
+                    <td name="productName">@item.Value.Name</td>
                     <td>@productLogic.GetCategories().FirstOrDefault(x => x.Key == item.Value.Category).Value</td>
                     <td>@producerLogic.GetAll().FirstOrDefault(x => x.Key == item.Value.Producer).Value.Name</td>
                     <td>
@@ -201,9 +201,9 @@
                     </td>
                     <td>@string.Format("{0:C}", item.Value.Price)</td>
                     <td name="@item.Key">
-                        <div class="action" name="user-action">
-                            <a href="~/pages/administrator/EditProduct?id=@item.Key"><div class="btn btn-info" name="edit">Edit product</div></a>
-                            <a href="~/pages/administrator/DeleteProduct?id=@item.Key"><div class="btn btn-danger" name="delete">Delete</div></a>
+                        <div class="action" name="product-action">
+                            <div class="btn btn-info" name="edit">Edit product</div>
+                            <div class="btn btn-danger" name="delete">Delete</div>
                         </div>
                     </td>
                 </tr>
