@@ -2,10 +2,8 @@
 @using Epam.Mercato.Entities;
 @using Epam.Mercato.IOC;
 @using Epam.Mercato.Handlers;
-@using log4net;
-@using log4net.Config;
+@Model = Epam.Mercato.Entities.Cart;
 @{
-    
     Layout = "~/Pages/main/_MainLayout.cshtml";
     Page.Title = "Mercato. Товары для отделки";
     IProductLogic productLogic = DependencyResolver.ProductLogic;
@@ -25,21 +23,21 @@
             products = productLogic.GetAll();
             if (products.Count > 10)
             {
-                products = products.OrderByDescending(x=>x.Value.Price).Take(10).ToDictionary(x=>x.Key,x=>x.Value);
+                products = products.OrderByDescending(x => x.Value.Price).Take(10).ToDictionary(x => x.Key, x => x.Value);
             }
         }
         else
         {
             products = productLogic.GetAll(categoryId);
         }
-        if (Request["param"] == "brand"&&id!=0)
+        if (Request["param"] == "brand" && id != 0)
         {
-            products = productLogic.GetAll().Where(x=>x.Value.Producer==id).ToDictionary(x=>x.Key,x=>x.Value);
+            products = productLogic.GetAll().Where(x => x.Value.Producer == id).ToDictionary(x => x.Key, x => x.Value);
         }
     }
     if (IsPost)
     {
-        filter.IsDescending = Request["order"]=="desc" ? true : false;
+        filter.IsDescending = Request["order"] == "desc" ? true : false;
         filter.SearchPattern = Request["search"];
         filter.OrderProperty = Request["param"];
         int.TryParse(Request["categoryId"], out categoryId);
@@ -47,34 +45,34 @@
         products = productLogic.GetAll(filter);
     }
 }
-    <div class="container">
-        <form class="form-search row" action="~/" method="post">
-            <input type="text" name="categoryId" value="@categoryId" hidden />
-            <div class="form-group row col-12"><input type="text" class="search-pattern form-control col-12" placeholder="Enter your search query..." name="search" /></div>
-            <div class="form-group row col-12">
-                <label for="orderby" class="col-sm-2 col-form-label">Order by</label>
-                <div class="form-check form-check-inline">
-                    <input type="radio" id="ascen" class="form-check-input" name="order" value="ascen" checked />
-                    <label for="ascen" class="col-sm-2 col-form-label">Ascending</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input type="radio" id="desc" class="form-check-input" name="order" value="desc" />
-                    <label for="desc" class="col-sm-2 col-form-label">Descending</label>
-                </div>
-
-                <div class="col-sm-6">
-                    <select name="param" class="form-control-sm">
-                        <option disabled selected>Сортировка</option>
-                        <option value="price">Price</option>
-                        <option value="category">Category</option>
-                        <option value="producer">Producer</option>
-                    </select>
-                </div>
-                <div class="col-2"><button type="submit" class="btn btn-dark col-12">Filter</button></div>
+<div class="container">
+    <form class="form-search row" action="~/" method="post">
+        <input type="text" name="categoryId" value="@categoryId" hidden />
+        <div class="form-group row col-12"><input type="text" class="search-pattern form-control col-12" placeholder="Enter your search query..." name="search" /></div>
+        <div class="form-group row col-12">
+            <label for="orderby" class="col-sm-2 col-form-label">Order by</label>
+            <div class="form-check form-check-inline">
+                <input type="radio" id="ascen" class="form-check-input" name="order" value="ascen" checked />
+                <label for="ascen" class="col-sm-2 col-form-label">Ascending</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input type="radio" id="desc" class="form-check-input" name="order" value="desc" />
+                <label for="desc" class="col-sm-2 col-form-label">Descending</label>
             </div>
 
-        </form>
-    </div>
+            <div class="col-sm-6">
+                <select name="param" class="form-control-sm">
+                    <option disabled selected>Сортировка</option>
+                    <option value="price">Price</option>
+                    <option value="category">Category</option>
+                    <option value="producer">Producer</option>
+                </select>
+            </div>
+            <div class="col-2"><button type="submit" class="btn btn-dark col-12">Filter</button></div>
+        </div>
+
+    </form>
+</div>
 <div class="row">
     <div class="col col-2">
         <ul class="nav flex-column">
@@ -106,7 +104,7 @@
                             }
                         </div>
                         <div class="product-name">@item.Value.Name</div>
-                        <div class="product-price">@string.Format("{0:C}", item.Value.Price)</div>
+                        <div class="product-price">@string.Format("{0:C}", item.Value.Price)&nbsp;<a href="~/Pages/main/AddProductToCart?id=@item.Value.Id" id="result">В корзину</a></div>
                     </div>
 
                 </div>
@@ -114,5 +112,3 @@
         </div>
     </div>
 </div>
-
-    

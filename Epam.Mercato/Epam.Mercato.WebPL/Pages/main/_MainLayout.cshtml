@@ -26,8 +26,7 @@
                 <a href="~/about">О компании</a>
             </div>
             <div class="header-login">
-                @if (User.Identity.IsAuthenticated)
-                {<text>[</text><a href="~/EditUserInfo">@User.Identity.Name</a><text>]&nbsp;<a href="~/SignOutUser">SignOut</a></text>}
+
             </div>
         </div>
     </div>
@@ -38,5 +37,6 @@
     <script src="~/Scripts/jquery-3.0.0.js"></script>
     <script src="~/Scripts/bootstrap.js"></script>
     <script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+    <script src="~/Scripts/app/js.js"></script>
 </body>
 </html>
