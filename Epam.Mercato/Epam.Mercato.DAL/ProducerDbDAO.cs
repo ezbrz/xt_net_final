@@ -1,6 +1,7 @@
 ﻿using Epam.Mercato.DAO.Interfaces;
 using Epam.Mercato.Entities;
 using Epam.Mercato.Handlers;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -13,6 +14,7 @@ namespace Epam.Mercato.DAL
 {
     public class ProducerDbDAO : IProducerDAO
     {
+        private readonly ILog _logger = Logger.Log;
         static readonly string path = DataMode.GetPath("DBconnection");
         private static Dictionary<int, Producer> _producers = new Dictionary<int, Producer>();
         public bool AddNewProducer(Producer newProducer)
@@ -58,8 +60,9 @@ namespace Epam.Mercato.DAL
                 }
                 return true;
             }
-            catch
+            catch (SqlException e)
             {
+                _logger.Error(e.Message);
                 return false;
             }
         }
@@ -86,8 +89,9 @@ namespace Epam.Mercato.DAL
                 }
                 return true;
             }
-            catch
+            catch (SqlException e)
             {
+                _logger.Error(e.Message);
                 return false;
             }
         }
@@ -131,8 +135,9 @@ namespace Epam.Mercato.DAL
                 }
                 return true;
             }
-            catch
+            catch (SqlException e)
             {
+                _logger.Error(e.Message);
                 return false;
             }
         }

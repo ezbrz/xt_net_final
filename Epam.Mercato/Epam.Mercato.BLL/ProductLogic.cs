@@ -2,6 +2,9 @@
 using Epam.Mercato.DAO.Interfaces;
 using Epam.Mercato.Entities;
 using Epam.Mercato.Handlers;
+using log4net.Repository.Hierarchy;
+using log4net;
+using log4net.Config;
 using System;
 using System.Collections.Generic;
 using System.Linq;

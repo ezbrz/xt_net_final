@@ -19,6 +19,7 @@
     color:#ffffff;
 }
     .header-nav > a {
+        padding-right:15px;
         color: #ffffff;
         text-decoration: none;
     }
